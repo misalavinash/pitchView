@@ -2592,13 +2592,13 @@
       const SIX_DIRS = [1.4, 2.3, 0.5, -0.7, 3.7, 2.9];
       // constant crowd ambience (real stadium recording) — the default bed
       const ambientSound = new Audio(
-        "/crowd-ambient.mp3",
+        "/pitchview/crowd-ambient.mp3",
       );
       ambientSound.preload = "auto";
       ambientSound.loop = true;
       ambientSound.volume = 0.3;
       // extra IPL roar layered on top for the big moments
-      const sixSound = new Audio("/ipl-roar.mp3");
+      const sixSound = new Audio("/pitchview/ipl-roar.mp3");
       sixSound.preload = "auto";
       sixSound.volume = 0.5; // IPL roar at 50%
       function playSixRoar() {
