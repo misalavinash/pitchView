@@ -139,6 +139,19 @@
         width: 26px;
         height: 26px;
       }
+      .brand-name {
+        display: flex;
+        flex-direction: column;
+        line-height: 1;
+      }
+      .brand-stadium {
+        font-size: 8.5px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: var(--dim);
+        margin-top: 4px;
+        text-transform: uppercase;
+      }
       .nav-links {
         display: flex;
         gap: 4px;
@@ -946,7 +959,12 @@
       .benefit .check path {
         stroke: var(--ink);
       }
+      #seat-cta {
+        display: flex;
+        gap: 8px;
+      }
       #checkout {
+        flex: 1;
         height: 52px;
         border-radius: 11px;
         background: var(--yellow);
@@ -965,6 +983,41 @@
           transform 0.12s,
           box-shadow 0.12s,
           background 0.2s;
+      }
+      #book-btn {
+        flex: 1;
+        height: 52px;
+        border-radius: 11px;
+        background: var(--paper-2);
+        color: var(--ink);
+        border: 3px solid var(--ink);
+        font-size: 15px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 5px 5px 0 var(--ink);
+        transition:
+          transform 0.12s,
+          box-shadow 0.12s;
+      }
+      #book-btn:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 7px 7px 0 var(--ink);
+      }
+      #book-btn:active {
+        transform: translate(2.5px, 2.5px);
+        box-shadow: 1px 1px 0 var(--ink);
+      }
+      #book-btn svg {
+        width: 17px;
+        height: 17px;
+      }
+      #seatcard:not([data-state="suggested"]) #book-btn {
+        display: none;
       }
       #checkout:hover {
         transform: translate(-2px, -2px);
@@ -1371,7 +1424,10 @@
             opacity=".5"
           />
         </svg>
-        Pitch View
+        <div class="brand-name">
+          Pitch View
+          <span class="brand-stadium">M. Chinnaswamy Stadium</span>
+        </div>
       </div>
       <div class="nav-links">
         <a href="#" class="active">Stadium</a>
@@ -1601,17 +1657,31 @@
             </svg>
           </div>
         </div>
-        <button id="checkout">
-          <span id="checkout-label">Grab seat</span>
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.4"
-          >
-            <path d="M4 12h15M13 6l6 6-6 6" />
-          </svg>
-        </button>
+        <div id="seat-cta">
+          <button id="checkout">
+            <span id="checkout-label">Grab seat</span>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+            >
+              <path d="M4 12h15M13 6l6 6-6 6" />
+            </svg>
+          </button>
+          <button id="book-btn">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+            >
+              <path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1.5a2.5 2.5 0 0 0 0 5V16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1.5a2.5 2.5 0 0 0 0-5V8Z" />
+              <path d="M13 6v12" stroke-dasharray="2.4 2.4" />
+            </svg>
+            Book
+          </button>
+        </div>
         <div class="secure">
           <svg
             viewBox="0 0 24 24"
@@ -2706,11 +2776,11 @@
         t.yTop = t.y + t.rows * t.dy;
       });
       const ROOF = {
-        inRx: 88,
-        inRz: 88,
+        inRx: 90,
+        inRz: 83,
         inY: 44,
-        outRx: 118,
-        outRz: 118,
+        outRx: 122,
+        outRz: 110,
         outY: 48,
       };
 
@@ -3041,8 +3111,8 @@
             SEG,
             solarMat,
             150,
-            0.62,
-            0.62 + 5.35,
+            0.4,
+            0.4 + 2.15,
           ),
         );
         // inner compression ring
@@ -3110,6 +3180,26 @@
             (ROOF.outRz + 0.6) * Math.sin(a),
           );
           scene.add(col);
+        }
+        // press-box / media centre protrusion (south-side, ~4.8 rad)
+        {
+          const pbAngle = 4.75;
+          const pbCx = (ROOF.outRx + 7) * Math.cos(pbAngle);
+          const pbCz = (ROOF.outRz + 7) * Math.sin(pbAngle);
+          const pb = new THREE.Mesh(
+            new THREE.BoxGeometry(18, ROOF.outY - 2, 14),
+            MAT.facade,
+          );
+          pb.position.set(pbCx, (ROOF.outY - 2) / 2, pbCz);
+          pb.rotation.y = -pbAngle;
+          scene.add(pb);
+          const pbRoof = new THREE.Mesh(
+            new THREE.BoxGeometry(18.6, 1.2, 14.6),
+            MAT.roofTop,
+          );
+          pbRoof.position.set(pbCx, ROOF.outY, pbCz);
+          pbRoof.rotation.y = -pbAngle;
+          scene.add(pbRoof);
         }
         // facade edge light band
         scene.add(
@@ -3867,6 +3957,7 @@
         sbHint: $("sb-hint"),
         dock: $("dock"),
         ckLabel: $("checkout-label"),
+        bookBtn: $("book-btn"),
         seatcard: $("seatcard"),
         mm: $("mm").getContext("2d"),
         ov: $("ov").getContext("2d"),
@@ -3964,6 +4055,7 @@
         media: ["Media / broadcast box", "Not for public sale", "Camera position"],
       };
       function updatePanel(info, state) {
+        ui.seatcard.dataset.state = state;
         ui.pLabel.textContent =
           state === "confirmed"
             ? "SEAT CONFIRMED"
@@ -3988,7 +4080,9 @@
           ? "Not for sale"
           : state === "confirmed"
             ? "Seat secured ✓"
-            : "Grab seat";
+            : state === "suggested"
+              ? "View seat"
+              : "Grab seat";
         ui.seatcard.classList.remove("refresh");
         void ui.seatcard.offsetWidth;
         ui.seatcard.classList.add("refresh");
@@ -4433,6 +4527,9 @@
           toast("Taking you there first. Grab it once you like the view");
           flyToSeat(selectedIdx);
         }
+      });
+      ui.bookBtn.addEventListener("click", () => {
+        toast("Great choice! pitchView is a concept demo — no real tickets yet 🎟️", 3500);
       });
       ui.fav.addEventListener("click", () => ui.fav.classList.toggle("on"));
       function goHome() {
