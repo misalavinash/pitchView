@@ -768,7 +768,8 @@
         border: 2.5px solid var(--ink);
       }
 
-      #seatcard {
+      /* specificity must beat #rightcol .card { flex: none } — use double ID */
+      #rightcol #seatcard {
         flex: 1;
         min-height: 0;
         padding: 0;
@@ -4684,21 +4685,37 @@
           x.lineWidth = 1;
           x.stroke();
         });
-        // pitch
-        const pw = FIELD.L * sc,
-          ph = FIELD.W * sc;
-        x.fillStyle = "#15602a";
-        x.fillRect(cx - pw / 2, cy - ph / 2, pw, ph);
-        x.strokeStyle = "rgba(240,250,255,.75)";
+        // cricket outfield circle
+        const fr = FIELD.ropeR * sc;
+        x.beginPath();
+        x.arc(cx, cy, fr, 0, TAU);
+        x.fillStyle = "#1a5c2e";
+        x.fill();
+        x.strokeStyle = "rgba(255,255,255,.5)";
+        x.lineWidth = 1.5;
+        x.stroke();
+        // 30-yard fielding circle (dashed)
+        x.beginPath();
+        x.arc(cx, cy, 27.4 * sc, 0, TAU);
+        x.strokeStyle = "rgba(255,255,255,.3)";
         x.lineWidth = 1;
-        x.strokeRect(cx - pw / 2 + 2, cy - ph / 2 + 2, pw - 4, ph - 4);
-        x.beginPath();
-        x.moveTo(cx, cy - ph / 2 + 2);
-        x.lineTo(cx, cy + ph / 2 - 2);
+        x.setLineDash([4, 4]);
         x.stroke();
-        x.beginPath();
-        x.arc(cx, cy, ph * 0.13, 0, TAU);
-        x.stroke();
+        x.setLineDash([]);
+        // 22-yard pitch strip (tan)
+        const pl = FIELD.pitchLen * sc, ppw = FIELD.pitchW * sc;
+        x.fillStyle = "#c8a86b";
+        x.fillRect(cx - pl / 2, cy - ppw / 2, pl, ppw);
+        // crease lines
+        x.strokeStyle = "#fff";
+        x.lineWidth = 0.8;
+        [-1, 1].forEach(side => {
+          const ex = cx + side * (pl / 2 - pl * 0.12);
+          x.beginPath();
+          x.moveTo(ex, cy - ppw / 2 - 1.5);
+          x.lineTo(ex, cy + ppw / 2 + 1.5);
+          x.stroke();
+        });
         ui._ovScale = sc;
       }
       function drawOverview() {
