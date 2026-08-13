@@ -2696,14 +2696,31 @@
       /* cricket delivery cycle: run-up -> delivery -> SIX into the crowd */
       const cric = {
         t: 0,
-        period: 8, // every 8s: a six
+        period: 6,     // 6s per delivery
         runs: 148,
         wkts: 3,
-        sixFlash: 0, // >0 while the scoreboard shows SIX!
-        hitDone: false, // guards the once-per-ball six trigger
-        sixAng: 1.4, // azimuth the ball sails into the crowd
-        sixNum: 0, // running count of sixes hit
+        sixFlash: 0,
+        wicketFlash: 0,
+        hitDone: false,
+        sixAng: 1.4,
+        sixNum: 0,
+        outType: 'six',   // outcome of this delivery
+        outRuns: 6,
+        outArc: 22,       // peak height of ball arc
+        outRadius: 76,    // how far ball travels
       };
+      function pickDelivery() {
+        const r = rng();
+        // T20-realistic weights: dot 27%, 1 25%, 2 10%, 3 5%, 4 15%, 6 13%, W 5%
+        if (r < 0.27)  return { type: 'dot',    runs: 0, arc: 2,  radius: 7  };
+        if (r < 0.52)  return { type: 'single', runs: 1, arc: 4,  radius: 28 };
+        if (r < 0.62)  return { type: 'two',    runs: 2, arc: 5,  radius: 38 };
+        if (r < 0.67)  return { type: 'three',  runs: 3, arc: 7,  radius: 48 };
+        if (r < 0.82)  return { type: 'four',   runs: 4, arc: 9,  radius: 58 };
+        if (r < 0.95)  return { type: 'six',    runs: 6, arc: 22, radius: 76 };
+        if (cric.wkts < 9) return { type: 'wicket', runs: 0, arc: 16, radius: 44 };
+        return { type: 'four', runs: 4, arc: 9, radius: 58 }; // all-out protection
+      }
       // directions a six can be launched into the stands
       const SIX_DIRS = [1.4, 2.3, 0.5, -0.7, 3.7, 2.9];
       // constant crowd ambience (real stadium recording) — the default bed
@@ -3401,6 +3418,22 @@
             x.fillStyle = "#ffd84a";
             x.font = "700 46px " + f;
             x.fillText("MAXIMUM \u00b7 INTO THE CROWD!", w / 2, 435);
+          } else if (cric.wicketFlash > 0) {
+            // WICKET! dramatic screen
+            x.fillStyle = "#08000a";
+            x.fillRect(0, 0, w, h);
+            x.strokeStyle = "#cc1111";
+            x.lineWidth = 14;
+            x.strokeRect(8, 8, w - 16, h - 16);
+            x.fillStyle = "#cc1111";
+            x.font = "900 200px " + f;
+            x.fillText("WICKET!", w / 2, 230);
+            x.fillStyle = "#fff8e1";
+            x.font = "800 70px " + f;
+            x.fillText("RCB  " + cric.runs + "/" + cric.wkts, w / 2, 360);
+            x.fillStyle = "#ff7777";
+            x.font = "700 44px " + f;
+            x.fillText("OUT! \u00b7 TATA IPL 2026", w / 2, 435);
           } else {
             x.fillStyle = "#0b0406";
             x.fillRect(0, 0, w, h);
@@ -4891,7 +4924,12 @@
         if (cric.t >= P) {
           cric.t -= P;
           cric.hitDone = false;
-          cric.sixAng = SIX_DIRS[(rng() * SIX_DIRS.length) | 0]; // new direction each ball
+          cric.sixAng = SIX_DIRS[(rng() * SIX_DIRS.length) | 0];
+          const d = pickDelivery();
+          cric.outType = d.type;
+          cric.outRuns = d.runs;
+          cric.outArc  = d.arc;
+          cric.outRadius = d.radius;
         }
         const ct = cric.t;
 
@@ -4901,32 +4939,45 @@
         const relX = bowler.home.x + 2.4; // release point
         const impX = striker.home.x - 0.7; // point of contact
         const impZ = striker.home.z;
-        // where the six lands, up in the crowd (lower-stand seats)
-        const sixR = 76,
-          sixX = Math.cos(cric.sixAng) * sixR,
-          sixZ = Math.sin(cric.sixAng) * sixR,
-          sixY = 9;
+        // ball landing position — varies by outcome type
+        const shotX = Math.cos(cric.sixAng) * cric.outRadius;
+        const shotZ = Math.sin(cric.sixAng) * cric.outRadius;
+        const shotY = cric.outType === 'six' ? 9 : cric.outType === 'wicket' ? 7 : 0.2;
 
-        // fire the six exactly once, at the moment of contact
+        // score the delivery exactly once at moment of contact
         if (ct >= 2.15 && !cric.hitDone) {
           cric.hitDone = true;
-          cric.sixNum++;
-          cric.runs += 6;
-          cric.sixFlash = 2.8;
-          exciteU.value = 6.5; // crowd erupts — big lift so fans leap up
-          drawScoreboard();
-          // the crowd bed already cheers every ball; layer the loud IPL roar
-          // only occasionally (1st six, then every 4th) so it isn't fatiguing
-          if (cric.sixNum === 1 || cric.sixNum % 4 === 0) playSixRoar();
-          toast("SIX! 🎉  RCB " + cric.runs + "/" + cric.wkts, 2600);
+          if (cric.outType === 'wicket') {
+            cric.wkts++;
+            cric.wicketFlash = 3.0;
+            exciteU.value = 3.5;
+            drawScoreboard();
+            toast("WICKET! 🔴  RCB " + cric.runs + "/" + cric.wkts, 3000);
+          } else {
+            cric.runs += cric.outRuns;
+            if (cric.outType === 'six') {
+              cric.sixNum++;
+              cric.sixFlash = 2.8;
+              exciteU.value = 6.5;
+              drawScoreboard();
+              if (cric.sixNum === 1 || cric.sixNum % 4 === 0) playSixRoar();
+              toast("SIX! 🎉  RCB " + cric.runs + "/" + cric.wkts, 2600);
+            } else if (cric.outType === 'four') {
+              exciteU.value = 2.5;
+              drawScoreboard();
+              toast("FOUR!  RCB " + cric.runs + "/" + cric.wkts, 2000);
+            } else if (cric.outRuns > 0) {
+              drawScoreboard();
+            }
+          }
         }
-        // hold the SIX! banner, then restore the normal scoreboard
+        // hold flash banners, then restore scoreboard
         if (cric.sixFlash > 0) {
           cric.sixFlash -= dt;
-          if (cric.sixFlash <= 0) {
-            cric.sixFlash = 0;
-            drawScoreboard();
-          }
+          if (cric.sixFlash <= 0) { cric.sixFlash = 0; drawScoreboard(); }
+        } else if (cric.wicketFlash > 0) {
+          cric.wicketFlash -= dt;
+          if (cric.wicketFlash <= 0) { cric.wicketFlash = 0; drawScoreboard(); }
         } else if ((t | 0) % 5 === 0 && (t | 0) !== lastMinDraw) {
           lastMinDraw = t | 0;
           drawScoreboard();
@@ -4945,11 +4996,11 @@
           bp.y = k < 0.55 ? 1.5 - k * 1.6 : 0.28 + Math.abs(Math.sin((k - 0.55) * 7)) * 0.5;
           ball.rotation.x -= dt * 22;
         } else if (ct < 4.8) {
-          // the SIX: contact -> high, sailing into the crowd
+          // shot: ball travels to outcome landing spot with appropriate arc
           const k = (ct - 2.15) / 2.65;
-          bp.x = impX + (sixX - impX) * k;
-          bp.z = impZ + (sixZ - impZ) * k;
-          bp.y = 0.4 + (sixY - 0.4) * k + Math.sin(Math.PI * k) * 22;
+          bp.x = impX + (shotX - impX) * k;
+          bp.z = impZ + (shotZ - impZ) * k;
+          bp.y = 0.3 + (shotY - 0.3) * k + Math.sin(Math.PI * k) * cric.outArc;
           ball.rotation.x -= dt * 15;
         } else {
           // umpire signals; a fresh ball returns to the bowler
