@@ -715,14 +715,10 @@
         display: flex;
         flex-direction: column;
         gap: 18px;
-        overflow-y: auto;
-        scrollbar-width: none;
+        overflow: hidden;
         pointer-events: none;
         padding-left: 10px;
         padding-bottom: 10px;
-      }
-      #rightcol::-webkit-scrollbar {
-        display: none;
       }
       #rightcol .card {
         position: relative;
@@ -773,9 +769,29 @@
       }
 
       #seatcard {
-        padding: 18px 20px;
+        flex: 1;
+        min-height: 0;
+        padding: 0;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
+      }
+      #seatcard-scroll {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        scrollbar-width: none;
+        padding: 18px 20px 6px;
+      }
+      #seatcard-scroll::-webkit-scrollbar {
+        display: none;
+      }
+      #seatcard-cta-wrap {
+        flex: none;
+        padding: 0 20px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
       }
       #seatcard header {
         display: flex;
@@ -1044,7 +1060,7 @@
         cursor: default;
       }
       .secure {
-        margin-top: 12px;
+        margin-top: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1329,8 +1345,9 @@
           right: 0;
           left: 0;
           width: auto;
-          max-height: 46vh;
+          height: 46svh;
           padding: 0 14px 90px;
+          overflow: hidden;
         }
         #camcard {
           display: none;
@@ -1537,6 +1554,7 @@
       </section>
 
       <section id="seatcard" class="card" aria-label="Selected seat">
+        <div id="seatcard-scroll">
         <header>
           <div class="label">
             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -1659,41 +1677,44 @@
             </svg>
           </div>
         </div>
-        <div id="seat-cta">
-          <button id="checkout">
-            <span id="checkout-label">Grab seat</span>
+        </div><!-- /seatcard-scroll -->
+        <div id="seatcard-cta-wrap">
+          <div id="seat-cta">
+            <button id="checkout">
+              <span id="checkout-label">Grab seat</span>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.4"
+              >
+                <path d="M4 12h15M13 6l6 6-6 6" />
+              </svg>
+            </button>
+            <button id="book-btn">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.4"
+              >
+                <path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1.5a2.5 2.5 0 0 0 0 5V16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1.5a2.5 2.5 0 0 0 0-5V8Z" />
+                <path d="M13 6v12" stroke-dasharray="2.4 2.4" />
+              </svg>
+              Book
+            </button>
+          </div>
+          <div class="secure">
             <svg
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2.4"
+              stroke-width="2"
             >
-              <path d="M4 12h15M13 6l6 6-6 6" />
-            </svg>
-          </button>
-          <button id="book-btn">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.4"
-            >
-              <path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1.5a2.5 2.5 0 0 0 0 5V16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1.5a2.5 2.5 0 0 0 0-5V8Z" />
-              <path d="M13 6v12" stroke-dasharray="2.4 2.4" />
-            </svg>
-            Book
-          </button>
-        </div>
-        <div class="secure">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <rect x="4" y="10" width="16" height="10" rx="2" />
-            <path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg
-          >Concept demo · no real ticket sales
+              <rect x="4" y="10" width="16" height="10" rx="2" />
+              <path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg
+            >Concept demo · no real ticket sales
+          </div>
         </div>
       </section>
     </div>
