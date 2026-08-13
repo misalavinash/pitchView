@@ -139,18 +139,22 @@
         width: 26px;
         height: 26px;
       }
-      .brand-name {
-        display: flex;
-        flex-direction: column;
-        line-height: 1;
-      }
-      .brand-stadium {
-        font-size: 8.5px;
-        font-weight: 700;
-        letter-spacing: 0.06em;
-        color: var(--dim);
-        margin-top: 4px;
+      .stadium-badge {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: -14px;
+        background: var(--ink);
+        color: var(--paper);
+        font-size: 9.5px;
+        font-weight: 800;
+        letter-spacing: 0.09em;
         text-transform: uppercase;
+        padding: 4px 11px;
+        border-radius: 6px;
+        white-space: nowrap;
+        box-shadow: 2px 2px 0 rgba(0,0,0,.35);
+        pointer-events: none;
       }
       .nav-links {
         display: flex;
@@ -1016,7 +1020,7 @@
         width: 17px;
         height: 17px;
       }
-      #seatcard:not([data-state="suggested"]) #book-btn {
+      #book-btn {
         display: none;
       }
       #checkout:hover {
@@ -1413,7 +1417,7 @@
     <div id="vig" aria-hidden="true"></div>
 
     <nav>
-      <div class="brand">
+      <div class="brand" style="position:relative">
         <svg viewBox="0 0 24 24" fill="none">
           <path d="M12 2 21 7l-9 5-9-5 9-5Z" fill="#ec1c24" />
           <path d="M3 12l9 5 9-5" stroke="#f5c518" stroke-width="1.6" />
@@ -1424,10 +1428,8 @@
             opacity=".5"
           />
         </svg>
-        <div class="brand-name">
-          Pitch View
-          <span class="brand-stadium">M. Chinnaswamy Stadium</span>
-        </div>
+        Pitch View
+        <span class="stadium-badge">M. Chinnaswamy Stadium</span>
       </div>
       <div class="nav-links">
         <a href="#" class="active">Stadium</a>
@@ -2776,11 +2778,11 @@
         t.yTop = t.y + t.rows * t.dy;
       });
       const ROOF = {
-        inRx: 90,
-        inRz: 83,
+        inRx: 88,
+        inRz: 88,
         inY: 44,
-        outRx: 122,
-        outRz: 110,
+        outRx: 118,
+        outRz: 118,
         outY: 48,
       };
 
@@ -3112,7 +3114,7 @@
             solarMat,
             150,
             0.4,
-            0.4 + 2.15,
+            0.4 + 1.885,
           ),
         );
         // inner compression ring
@@ -3181,25 +3183,40 @@
           );
           scene.add(col);
         }
-        // press-box / media centre protrusion (south-side, ~4.8 rad)
+        // press-box / media centre protrusion — frustum shape, south side (~4.8 rad)
         {
           const pbAngle = 4.75;
-          const pbCx = (ROOF.outRx + 7) * Math.cos(pbAngle);
-          const pbCz = (ROOF.outRz + 7) * Math.sin(pbAngle);
-          const pb = new THREE.Mesh(
-            new THREE.BoxGeometry(18, ROOF.outY - 2, 14),
+          const pbDepth = 22;
+          const pbCx = (ROOF.outRx + pbDepth * 0.5) * Math.cos(pbAngle);
+          const pbCz = (ROOF.outRz + pbDepth * 0.5) * Math.sin(pbAngle);
+          // main frustum body: wide base (28), narrow top (16), tall (outY - 2)
+          const frustum = new THREE.Mesh(
+            new THREE.CylinderGeometry(8, 14, ROOF.outY - 2, 4, 1),
             MAT.facade,
           );
-          pb.position.set(pbCx, (ROOF.outY - 2) / 2, pbCz);
-          pb.rotation.y = -pbAngle;
-          scene.add(pb);
+          frustum.position.set(pbCx, (ROOF.outY - 2) / 2, pbCz);
+          frustum.rotation.y = Math.PI / 4 - pbAngle;
+          scene.add(frustum);
+          // wide flat roof cap overhangs the top slightly
           const pbRoof = new THREE.Mesh(
-            new THREE.BoxGeometry(18.6, 1.2, 14.6),
+            new THREE.BoxGeometry(26, 1.4, 26),
             MAT.roofTop,
           );
           pbRoof.position.set(pbCx, ROOF.outY, pbCz);
-          pbRoof.rotation.y = -pbAngle;
+          pbRoof.rotation.y = Math.PI / 4 - pbAngle;
           scene.add(pbRoof);
+          // glazing band across the front face
+          const glaze = new THREE.Mesh(
+            new THREE.BoxGeometry(22, ROOF.outY * 0.35, 1),
+            new THREE.MeshStandardMaterial({ color: 0x7ab8e8, roughness: 0.15, metalness: 0.6, transparent: true, opacity: 0.7, side: THREE.DoubleSide }),
+          );
+          glaze.position.set(
+            pbCx + 13 * Math.cos(pbAngle),
+            ROOF.outY * 0.55,
+            pbCz + 13 * Math.sin(pbAngle),
+          );
+          glaze.rotation.y = -pbAngle;
+          scene.add(glaze);
         }
         // facade edge light band
         scene.add(
@@ -4083,6 +4100,7 @@
             : state === "suggested"
               ? "View seat"
               : "Grab seat";
+        ui.bookBtn.style.display = state === "suggested" ? "flex" : "none";
         ui.seatcard.classList.remove("refresh");
         void ui.seatcard.offsetWidth;
         ui.seatcard.classList.add("refresh");
