@@ -612,7 +612,7 @@
 
       /* ---------- camera controls ---------- */
       #camcard {
-        bottom: 26px;
+        bottom: 14px;
         left: 26px;
         width: 302px;
         padding: 15px 17px 13px;
@@ -709,7 +709,7 @@
         position: fixed;
         top: 100px;
         right: 26px;
-        bottom: 26px;
+        bottom: 14px;
         width: 336px;
         z-index: 15;
         display: flex;
@@ -718,7 +718,7 @@
         overflow: hidden;
         pointer-events: none;
         padding-left: 10px;
-        padding-bottom: 10px;
+        padding-bottom: 0;
       }
       #rightcol .card {
         position: relative;
@@ -889,6 +889,13 @@
       }
       .seat-grid .cell:last-child {
         text-align: right;
+      }
+      #p-price {
+        white-space: nowrap;
+        display: flex;
+        align-items: baseline;
+        justify-content: flex-end;
+        gap: 3px;
       }
       #p-price .unit {
         font-size: 11px;
@@ -1066,11 +1073,12 @@
         align-items: center;
         justify-content: center;
         gap: 7px;
-        font-size: 11.5px;
+        font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         color: var(--dim);
+        white-space: nowrap;
       }
       .secure svg {
         width: 12px;
@@ -1714,7 +1722,7 @@
             >
               <rect x="4" y="10" width="16" height="10" rx="2" />
               <path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg
-            >Concept demo · no real ticket sales
+            >Concept demo · no real tickets
           </div>
         </div>
       </section>
