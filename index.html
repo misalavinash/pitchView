@@ -789,10 +789,7 @@
       }
       #seatcard-cta-wrap {
         flex: none;
-        padding: 0 20px 16px;
-        display: flex;
-        flex-direction: column;
-        gap: 0;
+        padding: 10px 20px 14px;
       }
       #seatcard header {
         display: flex;
@@ -993,33 +990,12 @@
       }
       #checkout {
         flex: 1;
-        height: 52px;
-        border-radius: 11px;
+        height: 44px;
+        border-radius: 10px;
         background: var(--yellow);
         color: var(--ink);
         border: 3px solid var(--ink);
-        font-size: 15px;
-        font-weight: 900;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        box-shadow: 5px 5px 0 var(--ink);
-        transition:
-          transform 0.12s,
-          box-shadow 0.12s,
-          background 0.2s;
-      }
-      #book-btn {
-        flex: 1;
-        height: 52px;
-        border-radius: 11px;
-        background: var(--paper-2);
-        color: var(--ink);
-        border: 3px solid var(--ink);
-        font-size: 15px;
+        font-size: 13px;
         font-weight: 900;
         text-transform: uppercase;
         letter-spacing: 0.03em;
@@ -1027,7 +1003,28 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        box-shadow: 5px 5px 0 var(--ink);
+        box-shadow: 4px 4px 0 var(--ink);
+        transition:
+          transform 0.12s,
+          box-shadow 0.12s,
+          background 0.2s;
+      }
+      #book-btn {
+        flex: 1;
+        height: 44px;
+        border-radius: 10px;
+        background: var(--paper-2);
+        color: var(--ink);
+        border: 3px solid var(--ink);
+        font-size: 13px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        box-shadow: 4px 4px 0 var(--ink);
         transition:
           transform 0.12s,
           box-shadow 0.12s;
@@ -1686,6 +1683,17 @@
             </svg>
           </div>
         </div>
+          <div class="secure">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="4" y="10" width="16" height="10" rx="2" />
+              <path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg
+            >Concept demo · no real tickets
+          </div>
         </div><!-- /seatcard-scroll -->
         <div id="seatcard-cta-wrap">
           <div id="seat-cta">
@@ -1712,17 +1720,6 @@
               </svg>
               Book
             </button>
-          </div>
-          <div class="secure">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <rect x="4" y="10" width="16" height="10" rx="2" />
-              <path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg
-            >Concept demo · no real tickets
           </div>
         </div>
       </section>
